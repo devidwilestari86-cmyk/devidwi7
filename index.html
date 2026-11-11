@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuis Interaktif: Mengenal Warisan Budaya Indonesia</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Poppins & Kalam -->
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            batikGold: '#D4AF37',
+            batikRed: '#C0392B',
+            batikBrown: '#8B5A2B',
+            culturalCream: '#FDFBF7',
+            culturalTeal: '#0E6BA8',
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            fun: ['Kalam', 'cursive'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar & Animations */
+    body {
+      background-color: #F7F5F0;
+      background-image: radial-gradient(#E5DDC8 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.93);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-bounce:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    /* Styles khusus untuk Cetak Sertifikat */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #certificate-print-zone, #certificate-print-zone * {
+        visibility: visible;
+      }
+      #certificate-print-zone {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    /* Keyframe pulse */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .float-anim {
+      animation: float 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 font-sans flex flex-col justify-between selection:bg-amber-200">
+
+  <!-- ================= HEADER & BGM PLAYER ================= -->
+  <header class="no-print bg-amber-700 text-white shadow-lg sticky top-0 z-40 border-b-4 border-amber-500">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Title / Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-amber-500 text-amber-950 p-2.5 rounded-2xl shadow-inner text-xl">
+          <i class="fa-solid fa-landmark"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight md:text-xl font-fun">Budaya Nusantara</h1>
+          <p class="text-xs text-amber-200">Kelas 6 SD • Pendidikan Pancasila & Kebudayaan</p>
+        </div>
+      </div>
+
+      <!-- BGM Audio Player Controller -->
+      <div class="flex items-center bg-amber-800/80 backdrop-blur px-3 py-1.5 rounded-full border border-amber-600/50 space-x-2 text-sm">
+        <button id="bgmToggleBtn" onclick="toggleBGM()" class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-400 text-amber-950 flex items-center justify-center transition shadow">
+          <i id="bgmIcon" class="fa-solid fa-music"></i>
+        </button>
+        <div class="hidden sm:block text-xs font-medium">
+          <span id="bgmStatus" class="block text-amber-200 text-[10px] uppercase font-bold">Lagu Daerah</span>
+          <span class="truncate max-w-[100px] inline-block align-bottom">Instrumental</span>
+        </div>
+        <!-- Volume slider -->
+        <input id="bgmVolume" type="range" min="0" max="1" step="0.1" value="0.3" onchange="adjustVolume(this.value)" class="w-16 accent-amber-400 cursor-pointer">
+        
+        <!-- Custom Audio URL Modal Trigger -->
+        <button onclick="toggleAudioUrlInput()" class="text-amber-300 hover:text-white text-xs px-1" title="Ganti URL Lagu Daerah">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden audio element for background music -->
+  <audio id="bgmAudio" loop preload="auto" crossorigin="anonymous">
+    <!-- Traditional Indonesian gamelan/gamelan style audio -->
+    <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=indonesian-gamelan-traditional-112328.mp3" type="audio/mpeg">
+    Browser Anda tidak mendukung audio player.
+  </audio>
+
+    <!-- Custom Audio URL Form (Hidden collapsible) -->
+    <div id="audioUrlContainer" class="hidden bg-amber-900 px-4 py-2 text-xs border-t border-amber-700 flex items-center justify-center space-x-2">
+      <span class="text-amber-200">URL Lagu Daerah (.mp3):</span>
+      <input type="text" id="customAudioUrl" placeholder="https://example.com/lagu-daerah.mp3" class="px-2 py-1 rounded text-slate-900 w-64 md:w-96 text-xs">
+      <button onclick="applyCustomAudio()" class="bg-amber-500 text-amber-950 px-3 py-1 rounded font-bold hover:bg-amber-400">Pasang</button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full">
+
+    <!-- ---------------- PAGE 1: LOGIN & SAMBUTAN ---------------- -->
+    <section id="loginSection" class="glass-card rounded-3xl p-6 md:p-10 shadow-2xl transition-all duration-500">
+      <div class="text-center space-y-4 max-w-2xl mx-auto">
+        
+        <!-- Badge & Mascot -->
+        <div class="inline-block relative">
+          <div class="w-24 h-24 md:w-32 md:h-32 mx-auto bg-amber-100 rounded-full flex items-center justify-center border-4 border-amber-400 shadow-lg float-anim">
+            <span class="text-5xl md:text-6xl">🏛️</span>
+          </div>
+          <span class="absolute bottom-0 right-0 bg-red-600 text-white text-xs px-2 py-1 rounded-full font-bold shadow">Kelas 6 SD</span>
+        </div>
+
+        <h2 class="text-2xl md:text-4xl font-extrabold text-amber-900 font-fun">
+          Petualangan Warisan Budaya Indonesia!
+        </h2>
+
+        <!-- Kata Motivasi awal -->
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl text-amber-800 text-sm md:text-base italic text-left shadow-sm">
+          <p class="font-semibold non-italic text-amber-900 mb-1">✨ Semangat Hari Ini:</p>
+          "Bangsa yang besar adalah bangsa yang menghargai dan melestarikan budayanya sendiri. Yuk, uji pengetahuanmu dan jadi Generasi Muda Pelestari Budaya Nusantara!"
+        </div>
+
+        <!-- Audio Speech Greeting Button -->
+        <div class="flex items-center justify-center">
+          <button onclick="playGreetingVoice()" class="flex items-center space-x-2 bg-pink-100 hover:bg-pink-200 text-pink-700 px-4 py-2 rounded-full border border-pink-300 text-xs md:text-sm font-semibold transition shadow-sm">
+            <i class="fa-solid fa-volume-high text-pink-500 text-base animate-pulse"></i>
+            <span>Dengarkan Sambutan Ibu Guru 👩‍🏫</span>
+          </button>
+        </div>
+
+        <!-- Form Login Nama -->
+        <div class="bg-white p-6 rounded-2xl border-2 border-amber-200 shadow-sm space-y-4 mt-6">
+          <label for="studentName" class="block text-left font-bold text-slate-700 text-sm md:text-base">
+            <i class="fa-solid fa-user-graduate text-amber-600 mr-2"></i>Masukkan Nama Lengkapmu:
+          </label>
+          <input type="text" id="studentName" placeholder="Contoh: Budi Santoso" 
+                 class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none text-slate-800 text-base md:text-lg transition"
+                 onkeyup="validateNameInput()" autocomplete="off">
+          
+          <p id="loginWarning" class="text-red-500 text-xs text-left hidden font-semibold">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>Isi nama dulu ya sebelum memulai kuis!
+          </p>
+
+          <button id="startBtn" onclick="startQuiz()" 
+                  class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 rounded-xl text-lg shadow-lg btn-bounce transition duration-200 flex items-center justify-center space-x-2 cursor-not-allowed opacity-60" disabled>
+            <span>Mulai Kuis Sekarang</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Info Singkat Kuis -->
+        <div class="grid grid-cols-3 gap-2 text-center text-xs text-slate-600 pt-2">
+          <div class="p-2 bg-slate-100 rounded-lg">
+            <span class="block font-bold text-amber-700 text-sm">10 Soal</span>
+            <span>Pilihan Ganda</span>
+          </div>
+          <div class="p-2 bg-slate-100 rounded-lg">
+            <span class="block font-bold text-amber-700 text-sm">20 Poin</span>
+            <span>Per Soal Benar</span>
+          </div>
+          <div class="p-2 bg-slate-100 rounded-lg">
+            <span class="block font-bold text-amber-700 text-sm">Sertifikat</span>
+            <span>Kelulusan Digital</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ---------------- PAGE 2: QUIZ SECTION ---------------- -->
+    <section id="quizSection" class="hidden glass-card rounded-3xl p-5 md:p-8 shadow-2xl transition-all duration-500">
+      
+      <!-- Quiz Header Info -->
+      <div class="flex flex-wrap items-center justify-between border-b border-amber-200 pb-4 mb-6 gap-2">
+        <div>
+          <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Peserta Kuis</span>
+          <h3 id="displayStudentName" class="font-bold text-slate-800 text-lg md:text-xl">Siswa</h3>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="text-right">
+            <span class="text-xs font-bold text-slate-400 uppercase">Skor Sementara</span>
+            <div id="liveScore" class="font-extrabold text-amber-600 text-xl">0 Poin</div>
+          </div>
+          <div class="bg-amber-100 px-3 py-1.5 rounded-xl text-amber-900 font-bold text-sm flex items-center">
+            <i class="fa-regular fa-clock mr-2 text-amber-600"></i>
+            <span id="timerDisplay">00:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mb-6">
+        <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+          <span id="questionProgressText">Soal 1 dari 10</span>
+          <span id="progressPercentage">10%</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner">
+          <div id="progressBar" class="bg-gradient-to-r from-amber-400 to-amber-600 h-full w-[10%] transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="bg-white rounded-2xl p-5 md:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div class="space-y-2">
+          <span id="questionCategory" class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">
+            Materi: Warisan Budaya
+          </span>
+          <h3 id="questionText" class="text-base md:text-xl font-bold text-slate-800 leading-relaxed">
+            Loading Soal...
+          </h3>
+        </div>
+
+        <!-- Option Buttons Grid -->
+        <div id="optionsContainer" class="grid grid-cols-1 gap-3">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Instant Feedback Box -->
+        <div id="feedbackBox" class="hidden p-4 rounded-xl border text-sm font-semibold transition-all"></div>
+      </div>
+
+      <!-- Quiz Navigation Buttons -->
+      <div class="flex justify-between items-center mt-6">
+        <button id="prevBtn" onclick="prevQuestion()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2.5 rounded-xl transition text-sm">
+          <i class="fa-solid fa-arrow-left mr-2"></i>Sebelumnya
+        </button>
+        <div class="ml-auto">
+          <button id="nextBtn" onclick="nextQuestion()" disabled class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-xl transition text-sm shadow-md cursor-not-allowed opacity-50">
+            <span>Selanjutnya</span>
+            <i class="fa-solid fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ---------------- PAGE 3: RESULT & CERTIFICATE ---------------- -->
+    <section id="resultSection" class="hidden space-y-8 transition-all duration-500">
+      
+      <!-- Summary Card -->
+      <div class="no-print glass-card rounded-3xl p-6 md:p-8 text-center space-y-6 shadow-2xl">
+        <div class="w-20 h-20 mx-auto bg-amber-500 text-white rounded-full flex items-center justify-center text-4xl shadow-lg float-anim">
+          🏆
+        </div>
+        
+        <div>
+          <h2 class="text-3xl font-extrabold text-amber-900 font-fun">Selamat! Kuis Selesai</h2>
+          <p class="text-slate-600 text-sm mt-1">Berikut adalah hasil evaluasi pembelajaran kamu:</p>
+        </div>
+
+        <!-- Score & Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto">
+          <div class="bg-white p-4 rounded-2xl border-2 border-amber-300 shadow-sm">
+            <span class="text-xs text-slate-500 font-bold uppercase block">Total Skor</span>
+            <span id="finalScoreDisplay" class="text-3xl font-extrabold text-amber-600">0</span>
+            <span class="text-xs text-slate-400 block">dari Maks. 200 Poin</span>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border-2 border-green-300 shadow-sm">
+            <span class="text-xs text-slate-500 font-bold uppercase block">Jawaban Benar</span>
+            <span id="correctAnswersCount" class="text-3xl font-extrabold text-green-600">0 / 10</span>
+            <span class="text-xs text-slate-400 block">Soal Dijawab Tepat</span>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border-2 border-blue-300 shadow-sm">
+            <span class="text-xs text-slate-500 font-bold uppercase block">Waktu Pengerjaan</span>
+            <span id="finalTimeDisplay" class="text-2xl font-extrabold text-blue-600">00:00</span>
+            <span class="text-xs text-slate-400 block">Total Menit & Detik</span>
+          </div>
+        </div>
+
+        <!-- Motivation message based on score -->
+        <div id="resultMotivation" class="p-4 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 text-sm font-medium">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+          <button onclick="printCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition btn-bounce flex items-center space-x-2">
+            <i class="fa-solid fa-print"></i>
+            <span>Cetak / Unduh Sertifikat (PDF)</span>
+          </button>
+          
+          <button onclick="restartQuiz()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-xl shadow-md transition text-sm">
+            <i class="fa-solid fa-rotate-right mr-2"></i>Ulangi Kuis
+          </button>
+        </div>
+      </div>
+
+      <!-- DIGITAL CERTIFICATE DISPLAY (PRINT ZONE) -->
+      <div id="certificate-print-zone" class="bg-white p-4 md:p-8 rounded-2xl border-8 border-double border-amber-600 shadow-2xl relative overflow-hidden max-w-3xl mx-auto my-6 text-slate-900">
+        <!-- Ornate Batik Frame Styling (CSS/SVG) -->
+        <div class="border-4 border-amber-400 p-6 md:p-10 rounded-lg relative bg-gradient-to-b from-amber-50/40 via-white to-amber-50/40">
+          
+          <!-- Decorative Top Corners -->
+          <div class="absolute top-2 left-2 text-amber-600 text-2xl">⚜️</div>
+          <div class="absolute top-2 right-2 text-amber-600 text-2xl">⚜️</div>
+          <div class="absolute bottom-2 left-2 text-amber-600 text-2xl">⚜️</div>
+          <div class="absolute bottom-2 right-2 text-amber-600 text-2xl">⚜️</div>
+
+          <div class="text-center space-y-4">
+            <!-- Header Sertifikat -->
+            <div class="space-y-1">
+              <span class="text-amber-800 tracking-widest text-xs font-bold uppercase">REPUBLIK INDONESIA • KEMENTERIAN PENDIDIKAN & KEBUDAYAAN</span>
+              <h2 class="text-2xl md:text-4xl font-extrabold text-amber-900 font-fun uppercase tracking-wider">SERTIFIKAT KELULUSAN</h2>
+              <p class="text-slate-500 text-xs italic">Nomor Registrasi: KUIS-BUDAYA/SD6/<span id="certCode">2026-001</span></p>
+            </div>
+
+            <div class="w-24 h-1 bg-amber-500 mx-auto rounded-full my-3"></div>
+
+            <p class="text-slate-600 text-xs md:text-sm">Sertifikat Penghargaan ini diberikan dengan bangga kepada:</p>
+
+            <!-- Nama Siswa -->
+            <div class="py-2">
+              <h3 id="certStudentName" class="text-2xl md:text-4xl font-black text-amber-900 underline decoration-amber-400 underline-offset-8">
+                NAMA SISWA
+              </h3>
+              <p class="text-xs text-amber-800 font-semibold mt-2">Siswa Kelas 6 SD - Pelestari Budaya Muda</p>
+            </div>
+
+            <!-- Keterangan Lulus -->
+            <p class="text-slate-700 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
+              Telah berhasil menyelesaikan dan lulus Kuis Interaktif Evaluasi Pembelajaran:
+              <br><strong class="text-amber-900">"Mengenal Warisan Budaya dan Kearifan Lokal di Indonesia"</strong>
+              <br>dengan perolehan nilai dan kualifikasi memuaskan.
+            </p>
+
+            <!-- Detail Nilai & Predikat -->
+            <div class="inline-flex items-center justify-center space-x-6 bg-amber-100/70 border border-amber-300 px-6 py-2.5 rounded-xl my-2">
+              <div>
+                <span class="text-[10px] text-amber-800 font-bold uppercase block">Nilai Akhir</span>
+                <span id="certScore" class="text-xl md:text-2xl font-black text-amber-900">200 / 200</span>
+              </div>
+              <div class="h-8 w-px bg-amber-300"></div>
+              <div>
+                <span class="text-[10px] text-amber-800 font-bold uppercase block">Predikat</span>
+                <span id="certGrade" class="text-sm md:text-base font-bold text-green-700">SANGAT MEMUASKAN</span>
+              </div>
+            </div>
+
+            <!-- Signature & Stamp Footer -->
+            <div class="grid grid-cols-2 gap-4 pt-6 mt-4 border-t border-amber-200 text-xs text-slate-600">
+              <div class="text-center">
+                <p id="certDate" class="text-[11px] mb-8">Tanggal: 11 November 2026</p>
+                <div class="w-32 border-b border-slate-400 mx-auto"></div>
+                <p class="font-bold text-slate-800 mt-1">Guru Pengampu Kebudayaan</p>
+              </div>
+              <div class="text-center flex flex-col items-center justify-end">
+                <!-- Stempel Digital Mockup -->
+                <div class="w-16 h-16 rounded-full border-2 border-dashed border-amber-600 flex items-center justify-center text-amber-700 font-bold text-[9px] uppercase tracking-tighter text-center p-1 mb-1 transform -rotate-12 bg-amber-50">
+                  Pelestari Budaya SD
+                </div>
+                <div class="w-32 border-b border-slate-400 mx-auto"></div>
+                <p class="font-bold text-slate-800 mt-1">Panitia Evaluasi Kuis</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="no-print bg-slate-900 text-slate-400 text-xs py-4 text-center mt-10 border-t border-slate-800">
+    <div class="max-w-4xl mx-auto px-4">
+      <p>© 2026 Kuis Interaktif Kebudayaan Indonesia • Kelas 6 Sekolah Dasar</p>
+      <p class="text-slate-500 mt-1">Materi disesuaikan dengan kurikulum Warisan Budaya Benda & Takbenda Indonesia.</p>
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* --------------------------------------------------
+       1. DATA SOAL KUIS (10 SOAL DARI PDF MATERI)
+       Nilai tiap soal = 20 Poin. Total = 200 Poin.
+    -------------------------------------------------- */
+    const quizQuestions = [
+      {
+        id: 1,
+        question: "Apakah yang dimaksud dengan warisan budaya?",
+        options: [
+          "Peninggalan benda, tradisi, pengetahuan, dan kebiasaan yang diwariskan dari generasi terdahulu kepada generasi berikutnya.",
+          "Semua barang modern buatan luar negeri yang diimpor ke Indonesia.",
+          "Peraturan hukum terbaru yang dibuat oleh pemerintah tahun ini.",
+          "Pariwisata alam yang baru saja ditemukan oleh wisatawan asing."
+        ],
+        answer: 0,
+        explanation: "Warisan budaya adalah peninggalan berupa benda, tradisi, pengetahuan, keterampilan, dan kebiasaan dari generasi terdahulu."
+      },
+      {
+        id: 2,
+        question: "Berdasarkan bentuknya, warisan budaya dapat dibedakan menjadi dua jenis, yaitu...",
+        options: [
+          "Warisan mahal dan warisan murah",
+          "Warisan budaya benda dan warisan budaya takbenda",
+          "Warisan alam dan warisan buatan",
+          "Warisan kuno dan warisan modern"
+        ],
+        answer: 1,
+        explanation: "Warisan budaya dibedakan menjadi 2 jenis: Warisan Budaya Benda dan Warisan Budaya Takbenda."
+      },
+      {
+        id: 3,
+        question: "Pengertian dari warisan budaya benda adalah...",
+        options: [
+          "Warisan budaya yang hanya bisa didengarkan saja melalui radio.",
+          "Warisan budaya yang tidak memiliki bentuk fisik sama sekali.",
+          "Warisan budaya yang memiliki bentuk fisik sehingga dapat dilihat dan disentuh.",
+          "Warisan budaya yang tersimpan di dalam pikiran manusia saja."
+        ],
+        answer: 2,
+        explanation: "Warisan budaya benda memiliki bentuk fisik nyata sehingga dapat dilihat dan disentuh secara langsung."
+      },
+      {
+        id: 4,
+        question: "Candi Prambanan yang megah di wilayah Yogyakarta dan Jawa Tengah merupakan contoh warisan budaya benda bercorak...",
+        options: [
+          "Islam",
+          "Buddha",
+          "Hindu",
+          "Konghucu"
+        ],
+        answer: 2,
+        explanation: "Candi Prambanan merupakan kompleks peninggalan sejarah bercorak Hindu dengan nilai sejarah tinggi."
+      },
+      {
+        id: 5,
+        question: "Rumah adat khas Minangkabau dari Sumatera Barat yang atapnya menyerupai tanduk kerbau bernama...",
+        options: [
+          "Rumah Joglo",
+          "Rumah Gadang",
+          "Rumah Tongkonan",
+          "Rumah Honai"
+        ],
+        answer: 1,
+        explanation: "Rumah Gadang dari Sumatera Barat memiliki bentuk atap khas menyerupai tanduk kerbau."
+      },
+      {
+        id: 6,
+        question: "Senjata tradisional Indonesia yang memiliki bentuk, ukiran khas, serta nilai sejarah, seni, dan filosofi adalah...",
+        options: [
+          "Keris",
+          "Panah",
+          "Tombak",
+          "Pedang Samurai"
+        ],
+        answer: 0,
+        explanation: "Keris merupakan senjata tradisional unik berukir yang kaya nilai seni, sejarah, dan filosofi."
+      },
+      {
+        id: 7,
+        question: "Warisan budaya yang tidak memiliki bentuk fisik, tetapi dapat dirasakan, didengar, dan dipelajari disebut...",
+        options: [
+          "Warisan Budaya Benda",
+          "Warisan Budaya Takbenda",
+          "Cagar Budaya",
+          "Monumen Nasional"
+        ],
+        answer: 1,
+        explanation: "Warisan Budaya Takbenda tidak berbentuk fisik namun dapat dirasakan, didengar, dan dipelajari."
+      },
+      {
+        id: 8,
+        question: "Seni pertunjukan tradisional dari Jawa yang menggunakan boneka kulit dan menyampaikan pesan moral kehidupan adalah...",
+        options: [
+          "Wayang Kulit",
+          "Tari Kecak",
+          "Lenong Betawi",
+          "Ludruk"
+        ],
+        answer: 0,
+        explanation: "Wayang Kulit dari Jawa dimainkan menggunakan boneka kulit untuk menyampaikan cerita bercita rasa moral."
+      },
+      {
+        id: 9,
+        question: "Angklung adalah alat musik tradisional dari Jawa Barat yang terbuat dari bambu. Angklung dimainkan dengan cara...",
+        options: [
+          "Ditiup dengan keras",
+          "Dipukul memakai kayu",
+          "Digoyangkan hingga menghasilkan bunyi indah",
+          "Dipetik dawainya"
+        ],
+        answer: 2,
+        explanation: "Angklung terbuat dari bambu dan dimainkan dengan cara digoyangkan."
+      },
+      {
+        id: 10,
+        question: "Di bawah ini yang MERUPAKAN salah satu cara melestarikan warisan budaya Indonesia adalah...",
+        options: [
+          "Acuh tak acuh terhadap kebudayaan lokal",
+          "Mempelajari, memakai, menjaga, dan menceritakan warisan budaya kepada teman",
+          "Merusak situs candi bersejarah saat berkunjung",
+          "Malu menggunakan pakaian adat tradisional"
+        ],
+        answer: 1,
+        explanation: "Melestarikan budaya dilakukan dengan 4 cara utama: Mempelajari, Menggunakan, Menjaga, dan Menceritakan."
+      }
+    ];
+
+    /* --------------------------------------------------
+       2. STATE APLIKASI
+    -------------------------------------------------- */
+    let currentQuestionIndex = 0;
+    let userAnswers = new Array(quizQuestions.length).fill(null);
+    let studentName = "";
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let isBGMPlaying = false;
+
+    /* --------------------------------------------------
+       3. SPEECH SYNTHESIS (SUARA SAMBUTAN CEWEK)
+    -------------------------------------------------- */
+    function playGreetingVoice() {
+      if (!('speechSynthesis' in window)) {
+        alert("Browser Anda tidak mendukung fitur Web Speech API.");
+        return;
+      }
+
+      // Hentikan suara yang sedang berjalan
+      window.speechSynthesis.cancel();
+
+      const textToSpeak = "Halo adik-adik pintar! Selamat datang di Kuis Warisan Budaya Indonesia. Kenali budaya bangsamu dan jadilah generasi pelestari Nusantara. Semangat belajar ya!";
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'id-ID';
+      utterance.rate = 0.95; // Kecepatan bicara bersahabat
+      utterance.pitch = 1.2; // Pitch agak tinggi untuk kesan suara cewek/ramah
+
+      // Cari suara wanita berbahasa Indonesia jika tersedia di OS/Browser
+      const voices = window.speechSynthesis.getVoices();
+      const femaleIndoVoice = voices.find(voice => 
+        voice.lang.includes('id') && (voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('gadis') || voice.name.toLowerCase().includes('indonesia') || voice.name.toLowerCase().includes('google') || voice.name.toLowerCase().includes('zira'))
+      ) || voices.find(voice => voice.lang.includes('id'));
+
+      if (femaleIndoVoice) {
+        utterance.voice = femaleIndoVoice;
+      }
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Load voices asynchronous
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
+    /* --------------------------------------------------
+       4. AUDIO BGM CONTROLLER
+    -------------------------------------------------- */
+    const bgmAudio = document.getElementById('bgmAudio');
+    const bgmToggleBtn = document.getElementById('bgmToggleBtn');
+    const bgmIcon = document.getElementById('bgmIcon');
+    const bgmStatus = document.getElementById('bgmStatus');
+
+    function toggleBGM() {
+      if (isBGMPlaying) {
+        bgmAudio.pause();
+        isBGMPlaying = false;
+        bgmIcon.className = 'fa-solid fa-music';
+        bgmStatus.textContent = 'BGM Paused';
+      } else {
+        bgmAudio.play().then(() => {
+          isBGMPlaying = true;
+          bgmIcon.className = 'fa-solid fa-pause';
+          bgmStatus.textContent = 'Memutar Lagu';
+        }).catch(err => {
+          console.log("Autoplay ditolak browser. Interaksi pengguna diperlukan.", err);
+          alert("Klik tombol ini sekali lagi untuk mengaktifkan musik latar lagu daerah!");
+        });
+      }
+    }
+
+    function adjustVolume(val) {
+      bgmAudio.volume = val;
+    }
+
+    function toggleAudioUrlInput() {
+      const container = document.getElementById('audioUrlContainer');
+      container.classList.toggle('hidden');
+    }
+
+    function applyCustomAudio() {
+      const url = document.getElementById('customAudioUrl').value.trim();
+      if (url) {
+        bgmAudio.src = url;
+        bgmAudio.play().then(() => {
+          isBGMPlaying = true;
+          bgmIcon.className = 'fa-solid fa-pause';
+          bgmStatus.textContent = 'Lagu Kustom';
+          alert("Berhasil mengganti musik latar!");
+        }).catch(e => {
+          alert("Gagal memuat URL audio tersebut. Pastikan link langsung ke file .mp3!");
+        });
+      }
+    }
+
+    /* --------------------------------------------------
+       5. VALIDASI LOGIN & START QUIZ
+    -------------------------------------------------- */
+    function validateNameInput() {
+      const input = document.getElementById('studentName');
+      const startBtn = document.getElementById('startBtn');
+      const warning = document.getElementById('loginWarning');
+
+      if (input.value.trim().length >= 2) {
+        startBtn.disabled = false;
+        startBtn.classList.remove('cursor-not-allowed', 'opacity-60');
+        warning.classList.add('hidden');
+      } else {
+        startBtn.disabled = true;
+        startBtn.classList.add('cursor-not-allowed', 'opacity-60');
+      }
+    }
+
+    function startQuiz() {
+      const nameInput = document.getElementById('studentName').value.trim();
+      if (!nameInput) {
+        document.getElementById('loginWarning').classList.remove('hidden');
+        return;
+      }
+
+      studentName = nameInput;
+      document.getElementById('displayStudentName').textContent = studentName;
+      document.getElementById('certStudentName').textContent = studentName;
+
+      // Jalankan suara sambutan otomatis saat mulai kuis jika belum diputar
+      playGreetingVoice();
+
+      // Coba jalankan BGM otomatis
+      if (!isBGMPlaying) {
+        toggleBGM();
+      }
+
+      // Switch screen
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('quizSection').classList.remove('hidden');
+
+      // Start timer & Render first question
+      startTimer();
+      renderQuestion();
+    }
+
+    /* --------------------------------------------------
+       6. TIMER FUNCTIONALITY
+    -------------------------------------------------- */
+    function startTimer() {
+      secondsElapsed = 0;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+        const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+        document.getElementById('timerDisplay').textContent = `${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
+
+    /* --------------------------------------------------
+       7. RENDER SOAL & NAVIGASI
+    -------------------------------------------------- */
+    function renderQuestion() {
+      const q = quizQuestions[currentQuestionIndex];
+      
+      // Update Progress
+      const total = quizQuestions.length;
+      const currentNum = currentQuestionIndex + 1;
+      const percentage = Math.round((currentNum / total) * 100);
+
+      document.getElementById('questionProgressText').textContent = `Soal ${currentNum} dari ${total}`;
+      document.getElementById('progressPercentage').textContent = `${percentage}%`;
+      document.getElementById('progressBar').style.width = `${percentage}%`;
+
+      // Render Question Content
+      document.getElementById('questionText').textContent = `${currentNum}. ${q.question}`;
+      
+      // Container opsi
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      const labels = ['A', 'B', 'C', 'D'];
+      const selectedAns = userAnswers[currentQuestionIndex];
+
+      q.options.forEach((optText, idx) => {
+        const isSelected = selectedAns === idx;
+        let btnClasses = "w-full text-left p-4 rounded-xl border-2 transition-all flex items-start space-x-3 text-sm md:text-base font-medium ";
+        
+        if (isSelected) {
+          btnClasses += "border-amber-500 bg-amber-50 text-amber-900 shadow-md ring-2 ring-amber-300";
+        } else {
+          btnClasses += "border-slate-200 bg-slate-50 hover:bg-amber-50/50 hover:border-amber-300 text-slate-700";
+        }
+
+        const optBtn = document.createElement('button');
+        optBtn.className = btnClasses;
+        optBtn.onclick = () => selectOption(idx);
+        optBtn.innerHTML = `
+          <span class="w-7 h-7 rounded-lg ${isSelected ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+            ${labels[idx]}
+          </span>
+          <span class="flex-grow">${optText}</span>
+        `;
+        container.appendChild(optBtn);
+      });
+
+      // Feedback display jika sudah dijawab
+      const feedbackBox = document.getElementById('feedbackBox');
+      if (selectedAns !== null) {
+        feedbackBox.classList.remove('hidden');
+        if (selectedAns === q.answer) {
+          feedbackBox.className = "p-4 rounded-xl border border-green-300 bg-green-50 text-green-900 text-sm font-medium";
+          feedbackBox.innerHTML = `<i class="fa-solid fa-circle-check text-green-600 mr-2"></i><strong>Jawabanmu Tepat!</strong> (+20 Poin)<br><span class="text-xs text-green-700 mt-1 block">${q.explanation}</span>`;
+        } else {
+          feedbackBox.className = "p-4 rounded-xl border border-red-300 bg-red-50 text-red-900 text-sm font-medium";
+          feedbackBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-600 mr-2"></i><strong>Kurang Tepat.</strong> Jawaban benar: <u>${labels[q.answer]}. ${q.options[q.answer]}</u><br><span class="text-xs text-red-700 mt-1 block">${q.explanation}</span>`;
+        }
+      } else {
+        feedbackBox.classList.add('hidden');
+      }
+
+      // Update Nav Buttons
+      const nextBtn = document.getElementById('nextBtn');
+      const prevBtn = document.getElementById('prevBtn');
+
+      if (currentQuestionIndex > 0) {
+        prevBtn.classList.remove('hidden');
+      } else {
+        prevBtn.classList.add('hidden');
+      }
+
+      if (selectedAns !== null) {
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+      } else {
+        nextBtn.disabled = true;
+        nextBtn.classList.add('cursor-not-allowed', 'opacity-50');
+      }
+
+      if (currentQuestionIndex === quizQuestions.length - 1) {
+        nextBtn.querySelector('span').textContent = 'Selesai & Lihat Sertifikat';
+      } else {
+        nextBtn.querySelector('span').textContent = 'Selanjutnya';
+      }
+
+      calculateLiveScore();
+    }
+
+    function selectOption(index) {
+      userAnswers[currentQuestionIndex] = index;
+      renderQuestion();
+    }
+
+    function calculateLiveScore() {
+      let score = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans !== null && ans === quizQuestions[idx].answer) {
+          score += 20; // 20 Poin per soal
+        }
+      });
+      document.getElementById('liveScore').textContent = `${score} Poin`;
+      return score;
+    }
+
+    function nextQuestion() {
+      if (userAnswers[currentQuestionIndex] === null) return;
+
+      if (currentQuestionIndex < quizQuestions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+
+    /* --------------------------------------------------
+       8. SELESAI KUIS & REKAP HASIL
+    -------------------------------------------------- */
+    function finishQuiz() {
+      stopTimer();
+      
+      const finalScore = calculateLiveScore();
+      let correctCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizQuestions[idx].answer) correctCount++;
+      });
+
+      // Update UI Result
+      document.getElementById('finalScoreDisplay').textContent = finalScore;
+      document.getElementById('correctAnswersCount').textContent = `${correctCount} / 10`;
+      
+      const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+      const timeStr = `${mins}:${secs}`;
+      document.getElementById('finalTimeDisplay').textContent = timeStr;
+
+      // Pesan motivasi berdasarkan hasil
+      const motivBox = document.getElementById('resultMotivation');
+      let predikat = "";
+      if (finalScore >= 180) {
+        predikat = "SANGAT MEMUASKAN (CUMLAUDE)";
+        motivBox.innerHTML = `🌟 <strong>Luar Biasa Hebat, ${studentName}!</strong> Kamu memperoleh skor sempurna / hampir sempurna. Kamu adalah Pelestari Budaya Muda sejati!`;
+      } else if (finalScore >= 140) {
+        predikat = "MEMUASKAN (BAIK)";
+        motivBox.innerHTML = `👍 <strong>Bagus Sekali, ${studentName}!</strong> Pengetahuan budayamu sudah sangat baik. Pertahankan dan terus pelajari kebudayaan Nusantara ya!`;
+      } else {
+        predikat = "CUKUP (PERLU BELAJAR LAGI)";
+        motivBox.innerHTML = `💪 <strong>Tetap Semangat, ${studentName}!</strong> Kamu sudah berusaha dengan baik. Yuk baca lagi materi Warisan Budaya dan coba kuis ini sekali lagi!`;
+      }
+
+      // Update isi Sertifikat
+      document.getElementById('certScore').textContent = `${finalScore} / 200`;
+      document.getElementById('certGrade').textContent = predikat;
+      
+      const now = new Date();
+      const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('certDate').textContent = `Tanggal: ${now.toLocaleDateString('id-ID', optionsDate)}`;
+      document.getElementById('certCode').textContent = `${now.getFullYear()}${now.getMonth()+1}${now.getDate()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      // Switch Screen
+      document.getElementById('quizSection').classList.add('hidden');
+      document.getElementById('resultSection').classList.remove('hidden');
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* --------------------------------------------------
+       9. RESTART KUIS
+    -------------------------------------------------- */
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      userAnswers = new Array(quizQuestions.length).fill(null);
+      document.getElementById('resultSection').classList.add('hidden');
+      document.getElementById('quizSection').classList.remove('hidden');
+      startTimer();
+      renderQuestion();
+    }
+
+    /* --------------------------------------------------
+       10. CETAK / UNDUH SERTIFIKAT
+    -------------------------------------------------- */
+    function printCertificate() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
